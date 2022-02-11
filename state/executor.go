@@ -380,6 +380,10 @@ func (t *Transition) nonceCheck(msg *types.Transaction) error {
 	nonce := t.state.GetNonce(msg.From)
 
 	if nonce != msg.Nonce {
+		fmt.Println("Account for nonce", msg.From.String())
+		fmt.Println("Expected nonce", nonce)
+		fmt.Println("Actual Nonce", msg.Nonce)
+
 		return ErrNonceIncorrect
 	}
 
@@ -478,10 +482,10 @@ func (t *Transition) apply(msg *types.Transaction) (*runtime.ExecutionResult, er
 	t.ctx.Origin = msg.From
 
 	var result *runtime.ExecutionResult
+	txn.IncrNonce(msg.From)
 	if msg.IsContractCreation() {
 		result = t.Create2(msg.From, msg.Input, value, gasLeft)
 	} else {
-		txn.IncrNonce(msg.From)
 		result = t.Call2(msg.From, *msg.To, msg.Input, value, gasLeft)
 	}
 
@@ -610,14 +614,19 @@ func (t *Transition) applyCreate(c *runtime.Contract, host runtime.Host) *runtim
 	gasLimit := c.Gas
 
 	if c.Depth > int(1024)+1 {
+		fmt.Println("Apply creation greska")
+		fmt.Println("Apply creation greska")
+		fmt.Println("Apply creation greska")
+		fmt.Println("Apply creation greska")
+		fmt.Println("Apply creation greska")
+		fmt.Println("Apply creation greska")
+		fmt.Println("Apply creation greska")
+
 		return &runtime.ExecutionResult{
 			GasLeft: gasLimit,
 			Err:     runtime.ErrDepth,
 		}
 	}
-
-	// Increment the nonce of the caller
-	t.state.IncrNonce(c.Caller)
 
 	// Check if there if there is a collision and the address already exists
 	if t.hasCodeOrNonce(c.Address) {
